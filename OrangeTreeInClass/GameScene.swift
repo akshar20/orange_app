@@ -9,7 +9,7 @@
 import SpriteKit
 import GameplayKit
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
    
     // MARK: sprite variables
     var orange:Orange?
@@ -22,6 +22,9 @@ class GameScene: SKScene {
         
         // add a boundary around the scene
         self.physicsBody = SKPhysicsBody(edgeLoopFrom: self.frame)
+        
+        // initialize the delegate
+        self.physicsWorld.contactDelegate = self
         
         // configure the line
         self.lineNode.lineWidth = 20
