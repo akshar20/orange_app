@@ -57,9 +57,29 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    
     func gameOver(){
         
+        let message = SKLabelNode(text:"YOU WIN!")
+        message.position = CGPoint(x:self.size.width/2, y:self.size.height/2)
+        message.fontColor = UIColor.magenta
+        message.fontSize = 100
+        message.fontName = "AvenirNext-Bold"
+        
+        addChild(message)
+        
+        // restart the game after 3 seconds
+        perform(#selector(GameScene.restartGame), with: nil,
+                afterDelay: 3)
+
     }
+    
+    @objc func restartGame() {
+        let scene = GameScene(fileNamed:"GameScene")
+        scene!.scaleMode = scaleMode
+        view?.presentScene(scene)
+    }
+
 
     override func didMove(to view: SKView) {
         
