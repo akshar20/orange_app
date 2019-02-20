@@ -18,6 +18,49 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var mouseStartingPosition:CGPoint = CGPoint(x:0, y:0)
     var lineNode = SKShapeNode()
     
+    
+    
+    func didBegin(_ contact: SKPhysicsContact) {
+        
+        let nodeA = contact.bodyA.node
+        let nodeB = contact.bodyB.node
+        
+        if(nodeA?.name == "skull"){
+            // Check that the bodies collided hard enough
+            if (contact.collisionImpulse) > 15 {
+                print("Collision impact: \(contact.collisionImpulse)")
+                
+                
+                // Animate and remove the skull
+                let reduceImageSize = SKAction.scale(by: 0.8, duration: 0.5)
+                let removeNode = SKAction.removeFromParent()
+                
+                let seq = SKAction.sequence([reduceImageSize, removeNode])
+                nodeA?.run(seq)
+                self.gameOver()
+            }
+            
+        }else if(nodeB?.name == "skull"){
+            // Check that the bodies collided hard enough
+            if (contact.collisionImpulse) > 15 {
+                print("Collision impact: \(contact.collisionImpulse)")
+                
+                
+                // Animate and remove the skull
+                let reduceImageSize = SKAction.scale(by: 0.8, duration: 0.5)
+                let removeNode = SKAction.removeFromParent()
+                
+                let seq = SKAction.sequence([reduceImageSize, removeNode])
+                nodeB?.run(seq)
+                self.gameOver()
+            }
+        }
+    }
+    
+    func gameOver(){
+        
+    }
+
     override func didMove(to view: SKView) {
         
         // add a boundary around the scene
@@ -32,9 +75,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.lineNode.strokeColor = UIColor.magenta
         addChild(lineNode)
     }
+    
+    
+    
     override func update(_ currentTime: TimeInterval) {
         
     }
+    
+    
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         guard let touch = touches.first  else {
@@ -65,8 +114,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     
-    // add some more touch functions here
     
+    
+    // add some more touch functions here
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         // 1. get the touch
@@ -87,6 +137,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.lineNode.path = path.cgPath
         
     }
+    
+    
+    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         guard let touch = touches.first  else {
