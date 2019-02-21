@@ -19,8 +19,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var lineNode = SKShapeNode()
     
     
+    var levelComplete = false
+    var currentLevel = 1
+    
     
     func didBegin(_ contact: SKPhysicsContact) {
+        
+        
+        if(levelComplete == true){
+            return
+        }
+        
         
         let nodeA = contact.bodyA.node
         let nodeB = contact.bodyB.node
@@ -58,7 +67,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     
+    func setLevel(levelNumber:Int) {
+        self.currentLevel = levelNumber
+    }
+    
+    
     func gameOver(){
+        self.levelComplete = true
         
         let message = SKLabelNode(text:"YOU WIN!")
         message.position = CGPoint(x:self.size.width/2, y:self.size.height/2)
@@ -68,16 +83,60 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         addChild(message)
         
+        
+        // load the next level
+        self.currentLevel = self.currentLevel + 1
+
+        
+        
+        guard let nextLevelScene = GameScene.jumpToNextLevel(levelNumber: self.currentLevel) else{
+            print("Error while loading next level")
+            return
+        }
+        
+        let waitAction = SKAction.wait(forDuration: 1)
+        
+        let showNextLevelAction = SKAction.run {
+            nextLevelScene.setLevel(levelNumber: self.currentLevel)
+            let transition = SKTransition.flipVertical(withDuration: 2)
+            nextLevelScene.scaleMode = .aspectFill
+            self.scene?.view?.presentScene(nextLevelScene, transition:transition)
+        }
+        
+        let sequence = SKAction.sequence([waitAction, showNextLevelAction])
+        
+        self.run(sequence)
         // restart the game after 3 seconds
-        perform(#selector(GameScene.restartGame), with: nil,
-                afterDelay: 3)
+       // perform(#selector(GameScene.restartGame), with: nil, afterDelay: 3)
 
     }
     
+    
+    // RESTART GAME
     @objc func restartGame() {
-        let scene = GameScene(fileNamed:"GameScene")
-        scene!.scaleMode = scaleMode
-        view?.presentScene(scene)
+        
+            let scene = GameScene(fileNamed:"GameScene")
+            scene!.scaleMode = scaleMode
+            view?.presentScene(scene)
+        
+    }
+    
+    
+    // JUMP TO NEXT LEVEL
+    class func jumpToNextLevel(levelNumber:Int) -> GameScene?{
+        
+        let fileName = "GameScene\(levelNumber)"
+        
+        // DEBUG nonsense
+        print("Trying to load file: \(levelNumber).sks")
+    
+        guard let scene = GameScene(fileNamed: fileName) else {
+            print("Cannot find level named: GameScene\(levelNumber).sks")
+            return nil
+        }
+        
+        scene.scaleMode = .aspectFill
+        return scene
     }
 
 
